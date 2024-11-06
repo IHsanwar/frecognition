@@ -26,6 +26,7 @@ for filename in os.listdir(known_faces_dir):
 def index():
     return render_template('index.html')
 
+
 @recognition_bp.route('/process_image', methods=['POST'])
 def process_image():
     # Get the base64 image data from the request
@@ -39,14 +40,19 @@ def process_image():
     face_locations = face_recognition.face_locations(rgb_frame, model="hog")
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
-    names = []
-    for face_encoding in face_encodings:
+    results = []
+    for face_location, face_encoding in zip(face_locations, face_encodings):
         distances = face_recognition.face_distance(known_faces_encodings, face_encoding)
         best_match_index = np.argmin(distances) if distances.size > 0 else None
+        name = "Unknown"
         if best_match_index is not None and distances[best_match_index] < 0.65:
             name = known_faces_names[best_match_index]
-        else:
-            name = "Unknown"
-        names.append(name)
-    
-    return jsonify({"names": names})
+
+        # Append name and location of the detected face
+        top, right, bottom, left = face_location
+        results.append({
+            "name": name,
+            "location": {"top": top, "right": right, "bottom": bottom, "left": left}
+        })
+
+    return jsonify({"results": results})
