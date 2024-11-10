@@ -91,6 +91,27 @@ def main():
             break
 
         frame_count += 1  # Increase frame count to control frequency of face detection
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.utils import secure_filename
+import os
+import uuid
+
+app = Flask(__name__)
+
+# Configure upload folder and allowed extensions
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Check if the extension is allowed
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
 
 if __name__ == '__main__':
     main()

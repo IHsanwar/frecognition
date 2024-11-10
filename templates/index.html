@@ -3,31 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Face Recognition with Bounding Boxes</title>
+    <title>Real-Time Face Recognition with Capture Button</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .cont {
-            position: relative;
-            display: inline-block;
-        }
-        #video, #overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-    </style>
+    
 </head>
 <body>
     <h1>Real-Time Face Recognition</h1>
     <div class="cont">
         <video id="video" width="640" height="480" autoplay></video>
+        
+        <p id="resultText"></p> <!-- ini nampilin nama orangnya jan diapus -->
         <canvas id="overlay" width="640" height="480"></canvas>
+        
+    <button id="captureBtn">Capture</button>
+
     </div>
 
     <script>
         const video = document.getElementById('video');
         const overlay = document.getElementById('overlay');
         const context = overlay.getContext('2d');
+        const resultText = document.getElementById('resultText');
+        const captureBtn = document.getElementById('captureBtn');
         let isProcessing = false;
 
         // Access the user's camera
@@ -39,9 +36,10 @@
                 console.error('Error accessing camera:', error);
             });
 
-        // Draw bounding boxes on the overlay canvas
+        // Draw bounding boxes and names on the overlay canvas
         function drawResults(results) {
             context.clearRect(0, 0, overlay.width, overlay.height); // Clear previous drawings
+            let detectedNames = [];
             results.forEach(result => {
                 const { name, location } = result;
                 const { top, right, bottom, left } = location;
@@ -55,11 +53,18 @@
                 context.fillStyle = "#00FF00";
                 context.font = "16px Arial";
                 context.fillText(name, left + 5, top - 10);
+
+                // Add name to list of detected names
+                if (name !== "Unknown") {
+                    detectedNames.push(name);
+                }
             });
+            // Display detected names
+            resultText.textContent = detectedNames.length > 0 ? `Detected: ${detectedNames.join(", ")}` : "No recognized faces.";
         }
 
-        // Capture and send frame for recognition every 1 second
-        function processFrame() {
+        // Capture and process frame when the Capture button is clicked
+        captureBtn.addEventListener('click', () => {
             if (isProcessing) return;
             isProcessing = true;
 
@@ -73,7 +78,7 @@
             // Convert the canvas to a base64 image
             const imageData = canvas.toDataURL('image/png');
             
-            // Send the frame to the server
+            // Send the frame to the server for processing
             fetch('/process_image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -88,10 +93,7 @@
                 console.error('Error processing frame:', error);
                 isProcessing = false;
             });
-        }
-
-        // Run processFrame every 1000 ms (1 second)
-        setInterval(processFrame, 1000);
+        });
     </script>
 </body>
 </html>
