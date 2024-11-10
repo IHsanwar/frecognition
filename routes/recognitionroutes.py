@@ -15,21 +15,24 @@ known_faces_encodings = []
 known_faces_names = []
 
 # Allowed file extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Load existing face data
-if not os.path.exists(known_faces_dir):
-    os.makedirs(known_faces_dir)
 
 for filename in os.listdir(known_faces_dir):
-    image = face_recognition.load_image_file(os.path.join(known_faces_dir, filename))
-    face_encodings = face_recognition.face_encodings(image)
-    if face_encodings:
-        known_faces_encodings.append(face_encodings[0])
-        known_faces_names.append(os.path.splitext(filename)[0])
+    # Check if the file has a valid image extension
+    if os.path.splitext(filename)[1].lower() in ALLOWED_EXTENSIONS:
+        image_path = os.path.join(known_faces_dir, filename)
+        image = face_recognition.load_image_file(image_path)
+        face_encodings = face_recognition.face_encodings(image)
+
+        if face_encodings:
+            known_faces_encodings.append(face_encodings[0])
+            known_faces_names.append(os.path.splitext(filename)[0])
+    else:
+        print(f"Skipping non-image file: {filename}")
 
 @recognition_bp.route('/')
 def index():
