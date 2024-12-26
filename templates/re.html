@@ -2,58 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Face Recognition</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
-    <style>
-        #video {
-            width: 640px;
-            height: 480px;
-            border: 1px solid black;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload or Capture Photo</title>
 </head>
 <body>
-    <h2>Face Recognition in Browser</h2>
-    <video id="video" autoplay muted></video>
+    <h2>Upload a Photo or Take a New One</h2>
+
+    <!-- File upload with camera access -->
+    <form id="uploadForm">
+        <label for="fileUpload">Choose a file or capture a photo:</label>
+        <input type="file" id="fileUpload" accept="image/*" capture="environment">
+        <button type="submit">Upload</button>
+    </form>
+
+    <!-- Display chosen or captured photo -->
+    <h3>Preview:</h3>
+    <img id="preview" alt="Selected or captured photo will appear here" style="display: none; max-width: 100%; height: auto;">
 
     <script>
-        async function setupCamera() {
-            const video = document.getElementById('video');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
+        // Preview the selected or captured image
+        const fileUpload = document.getElementById('fileUpload');
+        const preview = document.getElementById('preview');
 
-            // Load face-api models
-            await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-
-            video.addEventListener('play', () => {
-                const displaySize = { width: video.width, height: video.height };
-                faceapi.matchDimensions(video, displaySize);
-
-                setInterval(async () => {
-                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-                        .withFaceLandmarks().withFaceDescriptors();
-
-                    // Optional: Send recognized face data to the server
-                    detections.forEach(detection => {
-                        const faceData = detection.descriptor;
-                        sendToServer(faceData); // send recognized face data to server
-                    });
-                }, 100); // Adjust interval for performance
-            });
-        }
-
-        async function sendToServer(faceData) {
-            await fetch('/process_face_data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ faceData })
-            });
-        }
-
-        setupCamera();
+        fileUpload.addEventListener('change', () => {
+            const file = fileUpload.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    preview.src = reader.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
 </body>
 </html>

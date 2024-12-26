@@ -5,6 +5,8 @@ import cv2
 import base64
 import os
 import uuid  # For generating unique filename
+from routes.absensiroute import *
+
 
 recognition_bp = Blueprint('recognition', __name__)
 
@@ -54,7 +56,8 @@ def upload_file():
         return 'File uploaded successfully'
     else:
         return 'Invalid file type'
-
+    
+    
 @recognition_bp.route('/process_image', methods=['POST'])
 def process_image():
     data = request.json['image']
@@ -63,23 +66,37 @@ def process_image():
     frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+    # Get original frame dimensions
+    frame_height, frame_width, _ = rgb_frame.shape
+
+    # Detect faces
     face_locations = face_recognition.face_locations(rgb_frame, model="hog")
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
     results = []
+    name = "Unknown"  # Initialize name to avoid UnboundLocalError
+
     for face_location, face_encoding in zip(face_locations, face_encodings):
         distances = face_recognition.face_distance(known_faces_encodings, face_encoding)
         best_match_index = np.argmin(distances) if distances.size > 0 else None
-        name = "Unknown"
-        if best_match_index is not None and distances[best_match_index] < 0.90:
+        if best_match_index is not None and distances[best_match_index] < 0.50:
             name = known_faces_names[best_match_index]
 
         top, right, bottom, left = face_location
+
+        # Normalize coordinates (values between 0 and 1)
         results.append({
             "name": name,
-            "location": {"top": top, "right": right, "bottom": bottom, "left": left}
+            "location": {
+                "top": top / frame_height,
+                "right": right / frame_width,
+                "bottom": bottom / frame_height,
+                "left": left / frame_width
+            }
         })
 
+    # Insert the last recognized name or "Unknown"
+    insertdb(name)
     return jsonify({"results": results})
 
 

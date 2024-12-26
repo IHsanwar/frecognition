@@ -1,5 +1,6 @@
 from flask import Flask
 from routes.recognitionroutes import recognition_bp, UPLOAD_FOLDER # Import the blueprint only
+from routes.absensiroute import *
 import os
 app = Flask(__name__)
 

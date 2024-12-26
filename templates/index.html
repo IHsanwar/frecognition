@@ -16,7 +16,7 @@
         <canvas id="overlay" width="640px" height="480px"></canvas>
         
     <button id="captureBtn">Capture</button>
-
+    <a href="/register-image">Register Image</a>
     </div>
 
     <script>
@@ -44,15 +44,21 @@
                 const { name, location } = result;
                 const { top, right, bottom, left } = location;
 
+                // Adjust positions for canvas context
+                const adjustedTop = top * (overlay.height / video.videoHeight);
+                const adjustedRight = right * (overlay.width / video.videoWidth);
+                const adjustedBottom = bottom * (overlay.height / video.videoHeight);
+                const adjustedLeft = left * (overlay.width / video.videoWidth);
+
                 // Draw rectangle
                 context.strokeStyle = "#00FF00";
                 context.lineWidth = 2;
-                context.strokeRect(left, top, right - left, bottom - top);
+                context.strokeRect(adjustedLeft, adjustedTop, adjustedRight - adjustedLeft, adjustedBottom - adjustedTop);
 
                 // Draw name
                 context.fillStyle = "#00FF00";
                 context.font = "16px Arial";
-                context.fillText(name, left + 5, top - 10);
+                context.fillText(name, adjustedLeft + 5, adjustedTop - 10);
 
                 // Add name to list of detected names
                 if (name !== "Unknown") {
