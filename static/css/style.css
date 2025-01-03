@@ -7,6 +7,8 @@
     font-family: "Montserrat", sans-serif;
 }
 
+
+
 body {
     display: flex;
     justify-content: center;
@@ -21,7 +23,44 @@ h1 {
     margin-bottom: 20px;
     color: #333;
 }
-
+.button-31 {
+    background-color: #222;
+    border-radius: 4px;
+    border-style: none;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Farfetch Basis","Helvetica Neue",Arial,sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 0;
+    max-width: none;
+    min-height: 44px;
+    min-width: 10px;
+    outline: none;
+    overflow: hidden;
+    padding: 9px 20px 8px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    text-decoration: none;
+    
+  }
+  .button-31 a{
+      color: white;
+      text-decoration: none;
+  }
+  .button-31:hover,
+  .button-31:focus {
+    opacity: .75;
+    transition: 0.3s;
+    background-color: #222;
+  }
 .container {
     display: flex;
     flex-direction: column;
@@ -29,6 +68,8 @@ h1 {
 }
 
 .video-container {
+
+    margin-top: 40px;
     position: relative;
     width: 640px; /* Set fixed width */
     height: 480px; /* Set fixed height */
@@ -36,6 +77,7 @@ h1 {
 }
 
 #video, #overlay {
+    margin-top: 45px;
     top: 0;
     left: 0;
     width: 640px; /* Match the container width */
