@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Face</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #preview {
+            width: 100%;
+            max-width: 90px;
+            margin-top: 10px;
+            display: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Register Face</h2>
+    <form id="registerForm">
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        <input type="file" id="imageInput" accept="image/*" required>
+        <img id="preview" alt="Image preview">
+        <button type="button" onclick="submitForm()">Register Face</button>
+    </form>
+    <p id="statusMessage"></p>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // Show a preview of the uploaded image
+    imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                preview.src = reader.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Submit the form data to the server
+    // Submit the form data to the server
+    function submitForm() {
+        const name = document.getElementById('name').value;
+        const file = imageInput.files[0];
+
+        if (!name || !file) {
+            statusMessage.textContent = 'Please enter your name and upload an image.';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const imageBase64 = reader.result;
+            fetch('/register-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, image: imageBase64 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    statusMessage.textContent = data.error;
+                } else {
+                    statusMessage.textContent = data.message || 'Registration successful!';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusMessage.textContent = 'An error occurred. Please try again.';
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+
+</script>
+
+</body>
+</html>

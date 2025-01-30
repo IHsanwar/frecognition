@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload or Capture Photo</title>
+</head>
+<body>
+    <h2>Upload a Photo or Take a New One</h2>
+
+    <!-- File upload with camera access -->
+    <form id="uploadForm">
+        <label for="fileUpload">Choose a file or capture a photo:</label>
+        <input type="file" id="fileUpload" accept="image/*" capture="environment">
+        <button type="submit">Upload</button>
+    </form>
+
+    <!-- Display chosen or captured photo -->
+    <h3>Preview:</h3>
+    <img id="preview" alt="Selected or captured photo will appear here" style="display: none; max-width: 100%; height: auto;">
+
+    <script>
+        // Preview the selected or captured image
+        const fileUpload = document.getElementById('fileUpload');
+        const preview = document.getElementById('preview');
+
+        fileUpload.addEventListener('change', () => {
+            const file = fileUpload.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    preview.src = reader.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

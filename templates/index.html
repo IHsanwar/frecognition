@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Face Recognition with Capture Button</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+</head>
+<body>
+    <h1>Face Recognition</h1>
+    
+    <button class="button-31"><a href="/register-image" >Register Image</a></button>
+    <div class="cont">
+        <video id="video" width="640" height="480" autoplay></video>
+        
+        <p id="resultText"></p> <!-- ini nampilin nama orangnya jan diapus -->
+        <canvas id="overlay" width="640px" height="480px"></canvas>
+        
+    <button id="captureBtn">Capture</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const overlay = document.getElementById('overlay');
+        const context = overlay.getContext('2d');
+        const resultText = document.getElementById('resultText');
+        const captureBtn = document.getElementById('captureBtn');
+        let isProcessing = false;
+
+        // Access the user's camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => {
+                console.error('Error accessing camera:', error);
+            });
+
+        // Draw bounding boxes and names on the overlay canvas
+        function drawResults(results) {
+            context.clearRect(0, 0, overlay.width, overlay.height); // Clear previous drawings
+            let detectedNames = [];
+            results.forEach(result => {
+                const { name, location } = result;
+                const { top, right, bottom, left } = location;
+
+                // Adjust positions for canvas context
+                const adjustedTop = top * (overlay.height / video.videoHeight);
+                const adjustedRight = right * (overlay.width / video.videoWidth);
+                const adjustedBottom = bottom * (overlay.height / video.videoHeight);
+                const adjustedLeft = left * (overlay.width / video.videoWidth);
+
+                // Draw rectangle
+                context.strokeStyle = "#00FF00";
+                context.lineWidth = 2;
+                context.strokeRect(adjustedLeft, adjustedTop, adjustedRight - adjustedLeft, adjustedBottom - adjustedTop);
+
+                // Draw name
+                context.fillStyle = "#00FF00";
+                context.font = "16px Arial";
+                context.fillText(name, adjustedLeft + 5, adjustedTop - 10);
+
+                // Add name to list of detected names
+                if (name !== "Unknown") {
+                    detectedNames.push(name);
+                }
+            });
+            // Display detected names
+            resultText.textContent = detectedNames.length > 0 ? `Detected: ${detectedNames.join(", ")}` : "No recognized faces.";
+        }
+
+        // Capture and process frame when the Capture button is clicked
+        captureBtn.addEventListener('click', () => {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            // Draw the current video frame to a canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas to a base64 image
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Send the frame to the server for processing
+            fetch('/process_image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                drawResults(data.results);
+                isProcessing = false;
+            })
+            .catch(error => {
+                console.error('Error processing frame:', error);
+                isProcessing = false;
+            });
+        });
+    </script>
+</body>
+</html>

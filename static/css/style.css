@@ -1,0 +1,113 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+}
+
+
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: rgb(220, 220, 220);
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+.button-31 {
+    background-color: #222;
+    border-radius: 4px;
+    border-style: none;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Farfetch Basis","Helvetica Neue",Arial,sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 0;
+    max-width: none;
+    min-height: 44px;
+    min-width: 10px;
+    outline: none;
+    overflow: hidden;
+    padding: 9px 20px 8px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    text-decoration: none;
+    
+  }
+  .button-31 a{
+      color: white;
+      text-decoration: none;
+  }
+  .button-31:hover,
+  .button-31:focus {
+    opacity: .75;
+    transition: 0.3s;
+    background-color: #222;
+  }
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.video-container {
+
+    margin-top: 40px;
+    position: relative;
+    width: 640px; /* Set fixed width */
+    height: 480px; /* Set fixed height */
+    border: 2px solid black;
+}
+
+#video, #overlay {
+    margin-top: 45px;
+    top: 0;
+    left: 0;
+    width: 640px; /* Match the container width */
+    height: 480px; /* Match the container height */
+}
+
+#resultText {
+    margin-top: 15px;
+    font-size: 18px;
+    color: #555;
+}
+
+button {
+    position: absolute;
+    margin-top: 15px;
+    background-color: rgb(153, 153, 153);
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: whitesmoke;
+    color: black;
+}
+
+button:active {
+    background-color: rgb(0, 0, 0);
+    color: white;
+}
